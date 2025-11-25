@@ -12,7 +12,7 @@ We build models to predict whether a road collision is **fatal vs. non-fatal** u
 ├── data/
 │   ├── collision.csv
 │   ├── casualty.csv
-│   └── vehicle.csv
+│   ├── vehicle.csv
 │   └── variables_description.csv
 ├── requirements.txt
 ├── .gitignore
