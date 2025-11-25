@@ -12,7 +12,6 @@ from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import roc_auc_score
 
 # %%
 #### Load raw data ####
@@ -312,70 +311,47 @@ print(classification_report(y_test, y_pred_logit, digits=3))
 print("Test ROC AUC (lasso-logit):", roc_auc_score(y_test, y_proba_logit))
 
 # %%
-#### LASSO-based feature selection ####
-
-# 1) Extract trained preprocessor + classifier from the best LASSO pipeline
-best_logit_pipeline = best_logit
-best_preprocessor_logit = best_logit_pipeline.named_steps["preprocess"]
-lasso_clf = best_logit_pipeline.named_steps["clf"]
-
-# 2) Reconstruct feature names AFTER preprocessing
-# Numeric features: passed through StandardScaler (so 1/1 mapping)
-num_feature_names_logit = numeric_features
-
-# Categorical features: expanded by OneHotEncoder, we need to get them back
-ohe_logit = best_preprocessor_logit.named_transformers_["cat"]
-cat_feature_names_logit = ohe_logit.get_feature_names_out(categorical_features)
-
-# Combined feature space: [scaled numerics] + [one-hot categoricals]
-all_feature_names_logit = list(num_feature_names_logit) + list(cat_feature_names_logit)
-
-# 3) Get LASSO coefficients (for the positive class)
-coefs = lasso_clf.coef_.ravel()  # shape (n_features,)
-
-lasso_coef_df = (
-    pd.DataFrame({
-        "feature": all_feature_names_logit,
-        "coef": coefs
-    })
-    .assign(abs_coef=lambda df: df["coef"].abs())
-)
-
-# 4) Select effectively non-zero coefficients
-# we won't do exact zero, calculating with tiny numerical noise
-eps = 1e-6
-selected_lasso = lasso_coef_df[lasso_coef_df["abs_coef"] > eps].copy()
-selected_lasso = selected_lasso.sort_values("abs_coef", ascending=False)
-
-print("\n=== LASSO feature selection results ===")
-print(f"Total preprocessed features: {lasso_coef_df.shape[0]}")
-print(f"Selected (non-zero) features: {selected_lasso.shape[0]}")
-print("\nTop 30 selected features by |coef|:")
-print(selected_lasso.head(30))
-
-# %%
-#### LASSO-based feature selection and refitting a simpler logistic model ####
+#### LASSO-based feature selection: dropped features + refit simpler logistic model ####
 
 # 1) Extract trained preprocessor + LASSO classifier from the best pipeline
 best_logit_pipeline = best_logit
 preprocessor_logit = best_logit_pipeline.named_steps["preprocess"]
 lasso_clf = best_logit_pipeline.named_steps["clf"]
 
-# 2) Transform X_train and X_test with the fitted preprocessor
+# 2) Build list of preprocessed feature names
+num_feature_names = numeric_features
+
+ohe = preprocessor_logit.named_transformers_["cat"]
+cat_feature_names = ohe.get_feature_names_out(categorical_features)
+
+all_feature_names = np.array(list(num_feature_names) + list(cat_feature_names))
+
+# 3) Get LASSO coefficients and masks
+coefs = lasso_clf.coef_.ravel()
+nonzero_idx = np.where(coefs != 0)[0]
+zero_idx = np.where(coefs == 0)[0]
+
+selected_features = all_feature_names[nonzero_idx]
+dropped_features = all_feature_names[zero_idx]
+
+print("\n=== LASSO feature selection results ===")
+print(f"Total preprocessed features: {len(all_feature_names)}")
+print(f"Selected (non-zero) features: {len(selected_features)}")
+print(f"Dropped  (zero) features: {len(dropped_features)}")
+
+print("\nDropped features (zero coefficients):")
+for f in dropped_features:
+    print(f)
+
+# 4) Transform X_train and X_test with the fitted preprocessor
 X_train_trans = preprocessor_logit.transform(X_train)
 X_test_trans = preprocessor_logit.transform(X_test)
 
-# 3) Get LASSO coefficients and select non-zero ones
-coefs = lasso_clf.coef_.ravel()        # shape (n_features_after_preprocessing,)
-nonzero_idx = np.where(coefs != 0)[0]  # indices of selected features
-
-print(f"\nLASSO selected {len(nonzero_idx)} out of {len(coefs)} preprocessed features.")
-
-# 4) Reduce the transformed feature matrices to the selected columns only
+# 5) Reduce the transformed feature matrices to the selected columns only
 X_train_sel = X_train_trans[:, nonzero_idx]
 X_test_sel = X_test_trans[:, nonzero_idx]
 
-# 5) Refit a simpler logistic regression on the selected features (L2-regularized)
+# 6) Refit a simpler logistic regression on the selected features (L2-regularized)
 simple_logit = LogisticRegression(
     penalty="l2",
     solver="liblinear",
@@ -391,7 +367,6 @@ y_proba_simple = simple_logit.predict_proba(X_test_sel)[:, 1]
 print("\n=== Logistic regression on LASSO-selected features ===")
 print(classification_report(y_test, y_pred_simple, digits=3))
 print("Test ROC AUC (simple logit on selected features):", roc_auc_score(y_test, y_proba_simple))
-
 # %%
 #### Random Forest + CV ####
 
@@ -580,6 +555,6 @@ comparison_df = pd.DataFrame({
         rf_recall_fatal,
     ],
 })
+
 print("\n=== MODEL COMPARISON (test set) ===")
-print(comparison_df)
-# %%
+print(comparison_df.sort_values("roc_auc", ascending=False))
