@@ -9,7 +9,6 @@ AIML_python_Roli_v2.ipynb
 # --- Mac OS junk ---
 .DS_Store
 
-# Ignore assignment docs and reports
+# Ignore docs and htmls
 *.html
 *.docx
-*.pdf
