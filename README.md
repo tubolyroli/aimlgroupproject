@@ -6,7 +6,7 @@
 Traffic accidents are a leading cause of non-natural death. While most accidents are minor, a small fraction (~1.5%) are fatal. This project builds a machine learning pipeline to identify the key risk factors associated with these fatal outcomes, prioritizing **recall** (catching as many fatal cases as possible) over simple accuracy.
 
 ## Data Source
-The dataset is derived from the **Department for Transport (UK) Road Safety Data** (STATS19) for the year 2024.
+The dataset is derived from the [**Department for Transport (UK) Road Safety Data**](https://www.gov.uk/government/statistics/reported-road-casualties-great-britain-annual-report-2024) (STATS19) for the year 2024.
 It consists of three linked CSV files:
 1.  `collision.csv`: Event details (location, time, weather, road conditions).
 2.  `vehicle.csv`: Vehicle details (type, age, engine size) and driver demographics (age, sex, socioeconomic decile).
