@@ -1,9 +1,10 @@
 # --- Python Basics ---
 __pycache__/
 *.pyc
+.cache
 
 # --- Jupyter Notebooks ---
-.ipynb_checkpoints
+.ipynb
 
 # --- Mac OS junk ---
 .DS_Store

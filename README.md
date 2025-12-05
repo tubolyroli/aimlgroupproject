@@ -35,6 +35,7 @@ To run the full end-to-end analysis (cleaning, processing, training, and evaluat
 
 ```bash
 python main.py --data_path data --seed 69
+```
 
 ### Arguments
 * `--data_path`: The directory path where the script looks for the input CSV files (`collision.csv`, `vehicle.csv`, `casualty.csv`).
