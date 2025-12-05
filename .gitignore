@@ -4,7 +4,7 @@ __pycache__/
 .cache
 
 # --- Jupyter Notebooks ---
-.ipynb
+AIML_python_Roli_v2.ipynb
 
 # --- Mac OS junk ---
 .DS_Store

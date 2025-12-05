@@ -65,8 +65,8 @@ While the Baseline has high accuracy, it is useless for safety planning. The **L
 * **Memory Usage:** < 2GB RAM.
 
 ## Authors
-* [Ádám Burkus]
-* [Attila Sztreborny]
-* [Bendegúz Birkmayer]
-* [Bojta Rácz]
-* [Roland Tuboly]
+* Ádám Burkus
+* Attila Sztreborny
+* Bendegúz Birkmayer
+* Bojta Rácz
+* Roland Tuboly
