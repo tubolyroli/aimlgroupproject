@@ -1,7 +1,17 @@
-
-.DS_Store
-.cache
+# --- Python Basics ---
 __pycache__/
 *.pyc
-.venv/
-.vscode/
+
+# --- Jupyter Notebooks ---
+.ipynb_checkpoints
+
+# --- Mac OS junk ---
+.DS_Store
+
+# Ignore generated outputs (the script creates these)
+outputs/
+
+# Ignore assignment docs and reports
+*.html
+*.docx
+*.pdf
