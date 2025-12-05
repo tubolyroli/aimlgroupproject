@@ -1,0 +1,6 @@
+{
+    "model": "Lasso Logistic Regression",
+    "accuracy": 0.7725156048746656,
+    "recall_fatal": 0.71,
+    "roc_auc": 0.8321038251366121
+}

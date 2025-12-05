@@ -1,0 +1,6 @@
+{
+    "model": "Random Forest",
+    "accuracy": 0.9153373625284851,
+    "recall_fatal": 0.38,
+    "roc_auc": 0.8156766904690067
+}
