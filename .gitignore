@@ -4,11 +4,12 @@ __pycache__/
 .cache
 
 # --- Jupyter Notebooks ---
-AIML_python_Roli_v2.ipynb
+*.ipynb
 
 # --- Mac OS junk ---
 .DS_Store
 
-# Ignore docs and htmls
+# Ignore docs and htmls and ppts
 *.html
 *.docx
+*.pptx

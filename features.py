@@ -5,40 +5,51 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder, FunctionTransfo
 from sklearn.compose import ColumnTransformer
 
 def to_string(x):
-    """Helper to force-cast data to strings to prevent mixed-type errors in OneHotEncoder"""
+    """Helper function to force-cast data to strings"""
     return x.astype(str)
 
-def get_preprocessor(X_train):
+def get_preprocessors(X_train):
     """
-    Returns a ColumnTransformer that:
-    1. Imputes and scales numeric features.
-    2. Imputes and OneHotEncodes categorical features.
+    Defines the preprocessing pipelines for Logistic Regression and Trees.
+    Returns: preprocess_logit, preprocess_tree, numeric_features, categorical_features
     """
-    # Identify feature types
     numeric_features = X_train.select_dtypes(include=[np.number]).columns.tolist()
     categorical_features = X_train.columns.difference(numeric_features).tolist()
 
-    print(f"Preprocessing: {len(numeric_features)} numeric, {len(categorical_features)} categorical.")
+    print(f"Numeric features: {len(numeric_features)}")
+    print(f"Categorical features: {len(categorical_features)}")
 
-    # Numeric Pipeline
-    num_pipe = Pipeline(steps=[
+    # 1. Numeric Pipeline
+    num_logit_pipe = Pipeline(steps=[
         ('imputer', SimpleImputer(strategy='mean')),
         ('scaler', StandardScaler())
     ])
 
-    # Categorical Pipeline
-    cat_pipe = Pipeline(steps=[
+    # 2. Categorical Pipeline
+    cat_logit_pipe = Pipeline(steps=[
         ('imputer', SimpleImputer(strategy='constant', fill_value='missing')),
         ('cast_to_str', FunctionTransformer(to_string, validate=False)),
         ('encoder', OneHotEncoder(handle_unknown="ignore"))
     ])
 
-    # Combine
-    preprocessor = ColumnTransformer(
+    # Full Column Transformer for Logit
+    preprocess_logit = ColumnTransformer(
         transformers=[
-            ("num", num_pipe, numeric_features),
-            ("cat", cat_pipe, categorical_features),
+            ("num", num_logit_pipe, numeric_features),
+            ("cat", cat_logit_pipe, categorical_features),
         ]
     )
-    
-    return preprocessor
+
+    # Column Transformer for Trees (no scaling, just imputation)
+    preprocess_tree = ColumnTransformer(
+        transformers=[
+            ("num", SimpleImputer(strategy='mean'), numeric_features),
+            ("cat", Pipeline(steps=[
+                ('imputer', SimpleImputer(strategy='constant', fill_value='missing')),
+                ('cast_to_str', FunctionTransformer(to_string, validate=False)),
+                ('encoder', OneHotEncoder(handle_unknown="ignore"))
+            ]), categorical_features),
+        ]
+    )
+
+    return preprocess_logit, preprocess_tree, numeric_features, categorical_features

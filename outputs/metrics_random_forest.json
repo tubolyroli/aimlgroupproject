@@ -1,6 +1,12 @@
 {
     "model": "Random Forest",
-    "accuracy": 0.9153373625284851,
-    "recall_fatal": 0.38,
-    "roc_auc": 0.8156766904690067
+    "best_params": {
+        "clf__max_depth": 10,
+        "clf__min_samples_leaf": 10,
+        "clf__n_estimators": 200
+    },
+    "best_cv_recall": 0.674692254495159,
+    "test_accuracy": 0.7617655801050233,
+    "test_recall_fatal": 0.64,
+    "test_roc_auc": 0.8009344932783533
 }
