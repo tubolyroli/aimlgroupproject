@@ -2,7 +2,7 @@ import argparse
 from data import load_and_preprocess_data
 from features import get_preprocessors
 from models import train_lasso_cv, train_rf_cv
-from evaluate import evaluate_model_metrics, plot_feature_importance, run_final_comparison
+from evaluate import evaluate_model_metrics, plot_feature_importance, run_final_comparison, save_lasso_summary_best
 
 def main():
     parser = argparse.ArgumentParser(description="Run Full UK Road Safety Analysis")
@@ -22,6 +22,8 @@ def main():
     print("--- STEP 3: TRAINING LASSO (GridSearch) ---")
     lasso_grid = train_lasso_cv(X_train, y_train, preprocess_logit, seed=args.seed)
     y_pred_logit, y_proba_logit = evaluate_model_metrics(lasso_grid, X_test, y_test, "Lasso Logistic Regression")
+
+    save_lasso_summary_best(lasso_grid, X_test, y_test, num_feats, cat_feats)
 
     # 4. Train & Evaluate Random Forest
     print("--- STEP 4: TRAINING RANDOM FOREST (GridSearch) ---")
