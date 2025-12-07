@@ -9,7 +9,8 @@ __pycache__/
 # --- Mac OS junk ---
 .DS_Store
 
-# Ignore docs and htmls and ppts
+# Ignore docs and htmls and ppts and pdfs
 *.html
 *.docx
 *.pptx
+*.pdf
