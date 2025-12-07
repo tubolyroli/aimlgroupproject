@@ -22,7 +22,7 @@ This project requires **Python 3.8+**.
 1.  **Clone the repository:**
     ```bash
     git clone https://github.com/tubolyroli/aimlgroupproject
-    cd <your-repo-folder>
+    cd aimlgroupproject
     ```
 
 2.  **Install dependencies:**
