@@ -27,7 +27,7 @@ def load_and_preprocess_data(data_folder="data", seed=69):
         "pedestrian_crossing_human_control_historic", "pedestrian_crossing_physical_facilities_historic",
         "carriageway_hazards_historic", "lsoa_of_accident_location", "enhanced_severity_collision",
         "collision_injury_based", "collision_adjusted_severity_serious", "collision_adjusted_severity_slight",
-        "collision_severity",
+        "collision_severity","did_police_officer_attend_scene_of_accident",
     ]
 
     cols_to_drop_casualty = [
