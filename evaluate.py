@@ -182,3 +182,79 @@ def run_final_comparison(X_train, y_train, X_test, y_test,
     # Save the table too (Good practice)
     comparison_df.round(4).to_csv("outputs/final_model_comparison.csv", index=False)
     print("   [Saved] Comparison table to outputs/final_model_comparison.csv")
+
+
+def save_lasso_summary_best(lasso_grid, X_test, y_test, numeric_features, categorical_features, output_dir="outputs"):
+    """
+    Generates two CSV files for easy pasting into Word/PowerPoint:
+    1. 'lasso_aggregated_influence.csv': Grouped by category (Max Influence).
+    2. 'lasso_detailed_coefficients.csv': All non-zero coefficients with Odds Ratios.
+    """
+    print("\n=== Generating Lasso CSV Tables (for Word/PPT) ===")
+
+    # 1. Setup & Extraction
+    best_pipeline = lasso_grid.best_estimator_
+    clf = best_pipeline.named_steps['clf']
+    preprocessor = best_pipeline.named_steps['preprocess']
+
+    # 2. Extract Feature Names
+    try:
+        cat_pipeline = preprocessor.named_transformers_["cat"]
+        ohe = cat_pipeline.named_steps["encoder"]
+        cat_feature_names = ohe.get_feature_names_out(categorical_features)
+        feature_names = list(numeric_features) + list(cat_feature_names)
+    except Exception as e:
+        print(f"   [Error] Could not extract feature names: {e}")
+        return
+
+    # 3. Create the Detailed DataFrame
+    coeffs = clf.coef_[0]
+
+    df_detailed = pd.DataFrame({
+        "Feature": feature_names,
+        "Coefficient": coeffs,
+        "Log_Odds": coeffs,
+        "Abs_Log_Odds": np.abs(coeffs),
+        "Odds_Ratio": np.exp(coeffs)
+    })
+
+    # Sort by absolute strength
+    df_detailed = df_detailed.sort_values("Abs_Log_Odds", ascending=False)
+
+    # Filter out zero coefficients (features Lasso removed)
+    df_active = df_detailed[df_detailed["Coefficient"] != 0].copy()
+
+    # 4. Create the Aggregated DataFrame (Group by Max Influence)
+    def get_parent_category(feature_name):
+        if feature_name in numeric_features:
+            return feature_name
+        for cat in sorted(categorical_features, key=len, reverse=True):
+            if feature_name.startswith(f"{cat}_"):
+                return cat
+        return feature_name
+
+    df_active["Parent_Category"] = df_active["Feature"].apply(get_parent_category)
+
+    df_agg = df_active.groupby("Parent_Category").agg(
+        Max_Influence=("Abs_Log_Odds", "max"),
+        Driver_Feature=("Feature", lambda x: df_active.loc[x.index[0], "Feature"])
+    ).reset_index()
+
+    df_agg = df_agg.sort_values("Max_Influence", ascending=False)
+
+    # 5. Save to CSVs
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    # Table 1: Aggregated
+    path_agg = f"{output_dir}/lasso_aggregated_influence.csv"
+    df_agg.to_csv(path_agg, index=False)
+    print(f"   [Saved] Aggregated Table to {path_agg}")
+
+    # Table 2: Detailed
+    path_det = f"{output_dir}/lasso_detailed_coefficients.csv"
+    # Select and rename columns for a cleaner look in Word
+    df_export = df_active[["Feature", "Coefficient", "Odds_Ratio", "Abs_Log_Odds"]]
+    path_det = f"{output_dir}/lasso_detailed_coefficients.csv"
+    df_export.to_csv(path_det, index=False)
+    print(f"   [Saved] Detailed Coefficients to {path_det}")
