@@ -10,6 +10,7 @@ __pycache__/
 
 # Data and generated outputs
 data/*.csv
+data/*.xlsx
 outputs/*.json
 outputs/*.csv
 outputs/*.png

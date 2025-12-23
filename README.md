@@ -6,7 +6,7 @@
 **Why it matters:** fatal collisions are rare, so this project focuses on catching as many fatal cases as possible by prioritizing **recall** over accuracy.
 
 ## Data Source
-The dataset is derived from the [**Department for Transport (UK) Road Safety Data**](https://www.gov.uk/government/statistical-data-sets/road-safety-open-data?utm_source=chatgpt.com) (STATS19) for the year 2024.
+The dataset is derived from the [**Department for Transport (UK) Road Safety Data**](https://www.gov.uk/government/statistical-data-sets/road-safety-open-data) (STATS19) for the year 2024.
 It consists of three linked CSV files:
 1.  `collision.csv`: event details (location, time, weather, road conditions)
 2.  `vehicle.csv`: vehicle details (type, age, engine size) and driver demographics (age, sex, socioeconomic decile)
@@ -28,7 +28,7 @@ python scripts/data_download.py
 ```
 
 ## Data License
-The dataset is published under the Open Government Licence. This repository does not include the raw STATS19 data files.
+The dataset is published under the [**Open Government Licence v3.0**] (https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/?utm_source=chatgpt.com). This repository does not redistribute the raw STATS19 data files.
 
 ## Environment Setup
 Requires **Python 3.8+**.
@@ -51,7 +51,7 @@ Dependencies are pinned in requirements.txt for reproducibility.
 To run the full end-to-end analysis (cleaning, processing, training, and evaluation), run the following command:
 
 ```bash
-python main.py --data_path data --seed 69
+python scripts/main.py --data_path data --seed 69
 ```
 
 ### Arguments
@@ -71,11 +71,11 @@ After execution, the script generates an `outputs/` folder containing:
 * Console logs detailing feature importance and cross-validation scores
 
 ## Project Structure
-* `main.py`: **entry point**, orchestrates the entire pipeline
-* `data.py`: loads CSVs, aggregates to collision level, train/test splitting
-* `features.py`: contains preprocessing pipelines (imputation, scaling, one hot encoding)
-* `models.py`: defines the model architectures (Lasso Logistic Regression & Random Forest)
-* `evaluate.py`: calculates performance metrics and saves outputs to the `outputs/` folder
+* `scripts/main.py`: orchestrates the entire pipeline
+* `scripts/data.py`: loads CSVs, aggregates to collision level, train/test splitting
+* `scripts/features.py`: contains preprocessing pipelines (imputation, scaling, one hot encoding)
+* `scripts/models.py`: defines the model architectures (Lasso Logistic Regression & Random Forest)
+* `scripts/evaluate.py`: calculates performance metrics and saves outputs to the `outputs/` folder
 
 ## Methodology
 
