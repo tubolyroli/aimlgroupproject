@@ -3,21 +3,35 @@
 ## Project Overview
 **Research Question:** Can we predict the fatality of traffic collisions in the UK based on environmental conditions, vehicle characteristics, and driver demographics?
 
-Traffic accidents are a leading cause of non-natural death. While most accidents are minor, a small fraction (~1.5%) are fatal. This project builds a machine learning pipeline to identify the key risk factors associated with these fatal outcomes, prioritizing **recall** (catching as many fatal cases as possible) over simple accuracy.
+**Why it matters:** fatal collisions are rare, so this project focuses on catching as many fatal cases as possible by prioritizing **recall** over accuracy.
 
 ## Data Source
-The dataset is derived from the [**Department for Transport (UK) Road Safety Data**](https://www.gov.uk/government/statistics/reported-road-casualties-great-britain-annual-report-2024) (STATS19) for the year 2024.
+The dataset is derived from the [**Department for Transport (UK) Road Safety Data**](https://www.gov.uk/government/statistical-data-sets/road-safety-open-data?utm_source=chatgpt.com) (STATS19) for the year 2024.
 It consists of three linked CSV files:
-1.  `collision.csv`: Event details (location, time, weather, road conditions).
-2.  `vehicle.csv`: Vehicle details (type, age, engine size) and driver demographics (age, sex, socioeconomic decile).
-3.  `casualty.csv`: Details on people injured (severity, age, pedestrian status).
+1.  `collision.csv`: event details (location, time, weather, road conditions)
+2.  `vehicle.csv`: vehicle details (type, age, engine size) and driver demographics (age, sex, socioeconomic decile)
+3.  `casualty.csv`: details on people injured (severity, age, pedestrian status)
 
-**Data Access & Setup:**
-1.  Create a folder named `data/` in the root of this repository.
-2.  Place the three raw CSV files (`collision.csv`, `vehicle.csv`, `casualty.csv`) inside that folder.
+## Data Download
+### Option A: Download manually
+1. Download the three CSV files from the official source.
+2. Create a folder named `data/` in the repo root.
+3. Place the files inside `data/` and rename them exactly to:
+- `data/collision.csv`
+- `data/vehicle.csv`
+- `data/casualty.csv`
+
+### Option B: Download via script
+Run:
+```bash
+python scripts/data_download.py
+```
+
+## Data License
+The dataset is published under the Open Government Licence. This repository does not include the raw STATS19 data files.
 
 ## Environment Setup
-This project requires **Python 3.8+**.
+Requires **Python 3.8+**.
 
 1.  **Clone the repository:**
     ```bash
@@ -25,10 +39,13 @@ This project requires **Python 3.8+**.
     cd aimlgroupproject
     ```
 
-2.  **Install dependencies:**
+2.  **Create environment and install dependencies:**
     ```bash
+    python -m venv .venv
+    source .venv/bin/activate  # Windows: .venv\Scripts\activate
     pip install -r requirements.txt
     ```
+Dependencies are pinned in requirements.txt for reproducibility.
 
 ## Usage
 To run the full end-to-end analysis (cleaning, processing, training, and evaluation), run the following command:
@@ -38,54 +55,47 @@ python main.py --data_path data --seed 69
 ```
 
 ### Arguments
-* `--data_path`: The directory path where the script looks for the input CSV files (`collision.csv`, `vehicle.csv`, `casualty.csv`).
+* `--data_path`: directory containing the input CSV files (`collision.csv`, `vehicle.csv`, `casualty.csv`).
     * *Default:* `data` (expects a folder named 'data' in the same directory as the script).
-    * *Example:* `--data_path "C:/Downloads/my_project_data"`
-* `--seed`: The random seed used for data splitting and model initialization. Setting this ensures the results are exactly the same every time you run the script.
+* `--seed`: random seed for splitting and model initialization.
     * *Default:* `69`
 
 ### Outputs
 
 After execution, the script generates an `outputs/` folder containing:
 
-* `metrics_lasso_logistic_regression.json`: Performance scores.
+* `metrics_lasso_logistic_regression.json`
 
-* `predictions_lasso_logistic_regression.csv`: Raw predictions for further analysis.
+* `predictions_lasso_logistic_regression.csv`
 
-* Console logs detailing feature importance and cross-validation scores.
+* Console logs detailing feature importance and cross-validation scores
 
 ## Project Structure
-* `main.py`: **Entry Point**. Orchestrates the entire pipeline.
-* `data.py`: Loads raw CSVs, aggregates casualty/vehicle data to the collision level, and handles Train/Test splitting.
-* `features.py`: Contains preprocessing pipelines (Imputation, Scaling, One-Hot Encoding).
-* `models.py`: Defines the model architectures (Lasso Logistic Regression & Random Forest).
-* `evaluate.py`: Calculates performance metrics and saves outputs to the `outputs/` folder.
+* `main.py`: **entry Point**, orchestrates the entire pipeline
+* `data.py`: loads CSVs, aggregates to collision level, train/test splitting
+* `features.py`: contains preprocessing pipelines (imputation, scaling, one hot encoding)
+* `models.py`: defines the model architectures (Lasso Logistic Regression & Random Forest)
+* `evaluate.py`: calculates performance metrics and saves outputs to the `outputs/` folder
 
 ## Methodology
 
 ### 1. Data Preprocessing & Engineering
-The raw data consists of three relational tables: *Collisions*, *Vehicles*, and *Casualties*. Since our objective is to predict the severity of a **collision event**, we performed the following transformations:
-* **Aggregation:** We aggregated *Vehicle* and *Casualty* data to the *Collision* level. This involved creating summary features such as `share_male_drivers`, `mean_vehicle_age`, and `number_of_pedestrians`.
-* **Feature Engineering:** We derived temporal features (e.g., `time_band` for "Rush Hour" vs. "Night") and parsed demographic data.
-* **Handling Missingness:** We used a Pipeline approach to prevent data leakage. Numeric features were imputed with the mean, while categorical features (e.g., driver demographics in hit-and-run cases) were imputed with a constant "missing" marker.
-* **Encoding:** Categorical variables were transformed using One-Hot Encoding, resulting in a high-dimensional feature space (~80 features).
+* Join and aggregate relational tables to collision level
+* Engineer time features and summary statistics
+* Handle missingness inside sklearn Pipelines
+* One hot encode categorical variables
 
 ### 2. Modeling Strategy
-Given the extreme class imbalance (~1.5% fatal accidents), standard accuracy optimization would yield a trivial model that predicts "Non-Fatal" for every case. We addressed this via:
-* **Class Weighting:** We applied `class_weight='balanced'` to all models, effectively penalizing the misclassification of fatal accidents significantly more than non-fatal ones.
-* **Metric Selection:** We optimized for **Recall (Sensitivity)** on the Fatal class to maximize the detection of life-threatening accidents.
-
-We trained and compared three models using **5-Fold Stratified Cross-Validation**:
-1.  **Baseline (Majority Rule):** A naive model predicting the most frequent class (Non-Fatal).
-2.  **Lasso Logistic Regression (L1):** A linear model with L1 regularization to perform automatic feature selection on the sparse One-Hot encoded data.
-3.  **Random Forest:** An ensemble of decision trees to capture non-linear interactions.
-
----
+* Extreme class imbalance handled via class weights
+* Model selection optimized for fatal class recall
+* Models compared with stratified cross validation:
+    * baseline majority rule
+    * L1 logistic regression
+    * random forest
 
 ## Results
 
-### Model Performance Comparison
-We evaluated the models on a held-out Test Set (20% split). The results highlight the "Accuracy Paradox" inherent in imbalanced safety data.
+Example test set results: 
 
 | Model | Accuracy | Recall (Fatal) | ROC AUC |
 | :--- | :--- | :--- | :--- |
@@ -93,13 +103,32 @@ We evaluated the models on a held-out Test Set (20% split). The results highligh
 | **Random Forest** | 76.2% | 64.0% | 0.80 |
 | **Lasso Logistic Regression** | 71.0% | **77.7%** | **0.83** |
 
-### Key Findings
-1.  **The Accuracy Trade-off:** The Baseline model achieved near-perfect accuracy (98.5%) but failed to identify a single fatal accident (Recall = 0%). To create a useful safety tool, we accepted a lower accuracy (71.0%) in the Lasso model to achieve a **Recall of 77.7%**. This means our model successfully flags nearly **4 out of 5** fatal crashes.
-2.  **Linear vs. Non-Linear:** The Lasso Logistic Regression outperformed the Random Forest in both Recall (+13.7%) and ROC AUC (+0.03). This suggests that for this specific high-dimensional, sparse dataset, the global optimization of the linear model was more robust to noise than the local splits of the Random Forest.
-3.  **Risk Drivers:** Feature importance analysis revealed that **environmental context** (unlit roads at night, high speed limits) and **vulnerable road users** (pedestrians, motorcycles) are the strongest predictors of fatality, rather than vehicle mechanics alone.
+### Key takeaways:
+* Accuracy is misleading in rare event prediction, recall is the priority metric
+* Lasso performed best in this sparse high dimensional setting
+* Strong predictors include lighting, speed limit, and vulnerable road users
 
-## Expected Runtime
-* **Total Runtime:** ~ 5-10 minutes on a standard laptop.
+## Limitations
+* Observational data, no causal claims
+* Performance may shift across years and regions
+* Threshold choice changes false positive rate materially
+* Any post event information must not be used for prevention framing
+
+## Runtime and resource usage
+Measured on my machine using `/usr/bin/time -l`:
+
+- **Wall clock runtime (real):** ~403 s (≈ 6 min 43 s)
+- **CPU time:** 2077 s user + 40 s sys (multi-core execution, ~5× parallelism on average)
+- **Peak RAM (maximum resident set size):** 696,483,840 bytes (≈ 664 MB)
+
+Command used:
+```bash
+/usr/bin/time -l python scripts/main.py --data_path data --seed 69
+```
+
+## License
+Code is licensed under the MIT License. See `LICENSE`.
+Data is licensed separately under the Open Government Licence and is not redistributed in this repository.
 
 ## Authors
 * Ádám Burkus

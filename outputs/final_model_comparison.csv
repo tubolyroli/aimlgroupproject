@@ -1,5 +1,5 @@
 Model,Accuracy,Recall (Fatal),ROC AUC
 Baseline (Majority Rule),0.9851,0.0,0.5
 Baseline (Random Stratified),0.9704,0.0133,0.4991
-Lasso Logistic Regression,0.7101,0.7767,0.8287
-Random Forest,0.7618,0.64,0.8009
+Lasso Logistic Regression,0.7349,0.7167,0.8036
+Random Forest,0.7622,0.6033,0.7762

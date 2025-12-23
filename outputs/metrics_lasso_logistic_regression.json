@@ -3,8 +3,8 @@
     "best_params": {
         "clf__C": 0.01
     },
-    "best_cv_recall": 0.7920228215767635,
-    "test_accuracy": 0.710145645496879,
-    "test_recall_fatal": 0.7766666666666666,
-    "test_roc_auc": 0.8287441751315835
+    "best_cv_recall": 0.718813969571231,
+    "test_accuracy": 0.7348657485385911,
+    "test_recall_fatal": 0.7166666666666667,
+    "test_roc_auc": 0.8036154413490227
 }

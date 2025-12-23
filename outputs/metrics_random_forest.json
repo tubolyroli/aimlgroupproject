@@ -5,8 +5,8 @@
         "clf__min_samples_leaf": 10,
         "clf__n_estimators": 200
     },
-    "best_cv_recall": 0.674692254495159,
-    "test_accuracy": 0.7617655801050233,
-    "test_recall_fatal": 0.64,
-    "test_roc_auc": 0.8009344932783533
+    "best_cv_recall": 0.6248029045643154,
+    "test_accuracy": 0.7621618943822451,
+    "test_recall_fatal": 0.6033333333333334,
+    "test_roc_auc": 0.7762271614871434
 }

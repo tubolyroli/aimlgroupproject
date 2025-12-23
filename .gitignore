@@ -2,9 +2,15 @@
 __pycache__/
 *.pyc
 .cache
+.venv/
+.env
 
 # --- Jupyter Notebooks ---
 *.ipynb
+
+# Data and generated outputs
+data/
+outputs/
 
 # --- Mac OS junk ---
 .DS_Store
