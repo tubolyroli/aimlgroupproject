@@ -1,3 +1,4 @@
+[![smoke-test](https://github.com/tubolyroli/aimlgroupproject/actions/workflows/ci.yml/badge.svg)](https://github.com/tubolyroli/aimlgroupproject/actions/workflows/ci.yml)
 # AIML Group Project – UK Road Safety Analysis: Predicting Fatal Collisions
 
 ## Project Overview
@@ -28,10 +29,10 @@ python scripts/data_download.py
 ```
 
 ## Data License
-The dataset is published under the [**Open Government Licence v3.0**] (https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/?utm_source=chatgpt.com). This repository does not redistribute the raw STATS19 data files.
+The dataset is published under the [**Open Government Licence v3.0**](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/?utm_source=chatgpt.com). This repository does not redistribute the raw STATS19 data files.
 
 ## Environment Setup
-Requires **Python 3.8+**.
+Requires **Python 3.10+**.
 
 1.  **Clone the repository:**
     ```bash
@@ -95,7 +96,7 @@ After execution, the script generates an `outputs/` folder containing:
 
 ## Results
 
-Example test set results: 
+Test set results (single 80/20 split, seed 69):
 
 | Model | Accuracy | Recall (Fatal) | ROC AUC |
 | :--- | :--- | :--- | :--- |
