@@ -9,8 +9,10 @@ __pycache__/
 *.ipynb
 
 # Data and generated outputs
-data/
-outputs/
+data/*.csv
+outputs/*.json
+outputs/*.csv
+outputs/*.png
 
 # --- Mac OS junk ---
 .DS_Store
