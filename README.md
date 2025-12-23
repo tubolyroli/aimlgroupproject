@@ -71,7 +71,7 @@ After execution, the script generates an `outputs/` folder containing:
 * Console logs detailing feature importance and cross-validation scores
 
 ## Project Structure
-* `main.py`: **entry Point**, orchestrates the entire pipeline
+* `main.py`: **entry point**, orchestrates the entire pipeline
 * `data.py`: loads CSVs, aggregates to collision level, train/test splitting
 * `features.py`: contains preprocessing pipelines (imputation, scaling, one hot encoding)
 * `models.py`: defines the model architectures (Lasso Logistic Regression & Random Forest)
@@ -115,8 +115,15 @@ Example test set results:
 * Any post event information must not be used for prevention framing
 
 ## Runtime and resource usage
-Measured on my machine using `/usr/bin/time -l`:
+Full pipeline run on STATS19 2024 data.
 
+Environment:
+- Model: MacBook Air
+- Chip: Apple M4
+- Memory: 16 GB
+- Python version: 3.13.5
+
+Observed:
 - **Wall clock runtime (real):** ~403 s (≈ 6 min 43 s)
 - **CPU time:** 2077 s user + 40 s sys (multi-core execution, ~5× parallelism on average)
 - **Peak RAM (maximum resident set size):** 696,483,840 bytes (≈ 664 MB)
