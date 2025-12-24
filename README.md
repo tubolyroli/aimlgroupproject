@@ -113,7 +113,6 @@ Test set results (single 80/20 split, seed 69):
 * Observational data, no causal claims
 * Performance may shift across years and regions
 * Threshold choice changes false positive rate materially
-* Any post event information must not be used for prevention framing
 
 ## Runtime and resource usage
 Full pipeline run on STATS19 2024 data.
